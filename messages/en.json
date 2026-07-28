@@ -1,0 +1,59 @@
+{
+  "common": {
+    "appName": "CVPower",
+    "tagline": "Optimize your resume. Land the interview.",
+    "getStarted": "Get started",
+    "learnMore": "Learn more",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "home": "Home",
+    "builder": "Builder",
+    "analyze": "Analyze",
+    "templates": "Templates",
+    "docs": "Docs",
+    "github": "GitHub"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "switch": "Change language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "privacy": {
+    "badge": "100% on-device",
+    "tooltip": "Your resume and job data never leave your browser."
+  },
+  "home": {
+    "heroTitle": "The best free resume optimizer.",
+    "heroSubtitle": "Match your resume to any job, fix what matters, and export an ATS-safe PDF — entirely in your browser. Nothing is ever uploaded.",
+    "ctaPrimary": "Optimize my resume",
+    "ctaSecondary": "See how it works",
+    "featurePrivacyTitle": "Private by design",
+    "featurePrivacyBody": "No accounts, no servers, no tracking. Your data stays on your device.",
+    "featureScoreTitle": "Transparent scoring",
+    "featureScoreBody": "See exactly why you match — and precisely what to fix, ranked by impact.",
+    "featureAtsTitle": "ATS-safe exports",
+    "featureAtsBody": "Beautiful, parseable resumes that get past the filters and reach a human."
+  },
+  "footer": {
+    "builtWith": "Free and open-source. Built for job seekers.",
+    "privacy": "Privacy",
+    "docs": "Docs",
+    "license": "MIT License"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist.",
+    "back": "Back to home"
+  }
+}

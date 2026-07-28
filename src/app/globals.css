@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CVPower design tokens.
+ * All colors are HSL channels consumed via `hsl(var(--token))` in the Tailwind
+ * config. Light is the default; `.dark` is applied by next-themes on <html>.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 24% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 24% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 24% 11%;
+
+    --primary: 243 75% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 24% 11%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 24% 11%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 38 92% 12%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 243 75% 58%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222 26% 7%;
+    --foreground: 210 20% 96%;
+
+    --card: 222 24% 10%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 222 24% 10%;
+    --popover-foreground: 210 20% 96%;
+
+    --primary: 243 75% 66%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 19% 17%;
+    --secondary-foreground: 210 20% 96%;
+
+    --muted: 217 19% 17%;
+    --muted-foreground: 218 11% 65%;
+
+    --accent: 217 19% 17%;
+    --accent-foreground: 210 20% 96%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 65% 47%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 38 92% 12%;
+
+    --border: 217 19% 20%;
+    --input: 217 19% 20%;
+    --ring: 243 75% 66%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+  }
+
+  /* Consistent, accessible focus rings across the app. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
