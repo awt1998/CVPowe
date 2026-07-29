@@ -37,52 +37,60 @@ src/
 │       ├── templates/          # template gallery (M5)
 │       ├── privacy/            # privacy explainer + wipe control
 │       └── not-found.tsx
-├── components/
+├── components/                 # shared UI (not feature-owned)
 │   ├── ui/                     # shadcn primitives (M1)
 │   ├── brand/                  # logo, privacy-badge
 │   ├── layout/                 # container, site-header, site-footer
-│   ├── common/                 # theme-toggle, locale-switcher, shared atoms
-│   ├── builder/                # resume-form sections (M2)
-│   ├── analyze/                # score-ring, gap-list, recommendation-card (M3–M4)
-│   └── export/                 # template renderers, export dialog (M5)
-├── stores/                     # zustand stores (M2+)
-├── lib/
-│   ├── utils.ts
-│   ├── storage/                # persistence + migrations (M2)
-│   ├── parsing/                # pdf.js / mammoth adapters (M2)
-│   ├── taxonomy/               # skills dictionary + synonyms (M3)
-│   ├── matching/               # job-matching engine (M4)
-│   ├── scoring/                # scoring engine (M3)
-│   └── pdf/                    # pdf export engine (M5)
+│   └── common/                 # theme-toggle, locale-switcher, shared atoms
+├── features/                   # feature-based domains (business logic + feature UI)
+│   ├── resume/                 # ✅ M2 — the resume data engine (see §4)
+│   │   ├── constants.ts  schema.ts  types.ts  factory.ts
+│   │   ├── operations.ts       # pure state transforms (all business logic)
+│   │   ├── migrations.ts  serialization.ts  persistence.ts
+│   │   ├── store.ts  selectors.ts  index.ts   # public API barrel
+│   │   └── __tests__/          # vitest unit tests
+│   ├── scoring/                # M3 — scoring engine
+│   ├── matching/               # M4 — job-matching engine
+│   ├── pdf/                    # M5 — pdf export engine
+│   ├── templates/              # M5 — resume templates
+│   ├── ai/                     # M6 — rule-based on-device suggestions
+│   └── plugins/                # future — optional analyzers/exporters
+├── lib/                        # cross-feature utilities (utils, id, debounce)
 ├── hooks/
 ├── i18n/                       # next-intl routing/request/navigation
-├── config/                     # site metadata
-└── types/                      # shared TS types (defined in Milestone 2)
+└── config/                     # site metadata
 messages/                       # en.json, ar.json
 ```
 
+Each feature owns its domain end to end (types, logic, state, and later its UI) and
+exposes a single public API via `index.ts`. Nothing imports a feature's internal
+files directly. Dependencies flow one way: `app` → `features` → `lib`.
+
 ## 4. State architecture (Zustand)
-Four persisted stores plus one transient store. Each store owns a slice; cross-store reads happen via selectors, never by merging state.
+The resume engine (`features/resume`) is layered for testability:
 
-| Store | Persisted | Responsibility |
-| --- | --- | --- |
-| `resumeStore` | ✅ | Resume profiles, the active resume, section CRUD. |
-| `jobStore` | ✅ | Current + saved job descriptions and their extracted requirements. |
-| `analysisStore` | ✅ (cache only) | Latest scoring/matching results, memoized; recomputed when inputs change. |
-| `settingsStore` | ✅ | Locale, theme, active template, privacy flags. |
-| `uiStore` | ❌ | Modals, toasts, wizard step, transient flags. |
+- **Pure core** (`operations.ts`) — all business logic as `(ResumeData) => ResumeData`
+  functions. No React, no Zustand, no browser globals.
+- **Store** (`store.ts`) — a thin Zustand wrapper that orchestrates the pure
+  operations and wires persistence. `createResumeStore()` builds isolated instances
+  (used by tests); `useResumeStore` is the app singleton.
+- **Persistence** (`persistence.ts`) — SSR-safe, debounced LocalStorage adapter
+  behind Zustand's `persist`, with versioned `migrate`.
 
-**Derived-not-duplicated:** analysis results are a pure function of `activeResume + currentJob`. A selector triggers recomputation when either changes; results are cached in `analysisStore` for display but are never a second source of truth.
+Planned additional stores in later milestones: `jobStore` (M4), `analysisStore`
+(cache of scoring/matching results, M3–M4), `settingsStore` (locale/theme/template),
+and a transient `uiStore`. Analysis results will be **derived, not duplicated** — a
+pure function of `activeResume + currentJob`, memoized and cached for display only.
 
 ### Lifecycle per analysis view
 `empty` (no resume/job) → `editing` → `analyzing` (engine running, possibly in a Web Worker) → `analyzed` → `exporting`. Every state has an explicit render; there are no placeholder-only paths.
 
 ## 5. Persistence & storage schema
-- **Mechanism:** `localStorage`, wrapped by `lib/storage` with typed get/set, debounced writes, and a `schemaVersion` field.
-- **Migrations:** a `migrations[]` array upgrades older payloads on load; unknown/newer versions fall back safely rather than corrupting data.
-- **Namespacing:** keys prefixed `cvpower:` (e.g. `cvpower:resume`, `cvpower:settings`). A single `wipeAll()` clears every `cvpower:*` key.
+- **Mechanism:** `localStorage`, wrapped by `features/resume/persistence.ts` with an SSR-safe adapter, debounced writes (autosave), and a `schemaVersion`.
+- **Migrations:** `migrations.ts` upgrades older payloads one version at a time on load; the store validates the result with Zod and falls back to empty rather than corrupting state. Unknown/newer versions are not downgraded.
+- **Namespacing:** keys prefixed `cvpower:` (e.g. `cvpower:resume-store`). A future `wipeAll()` clears every `cvpower:*` key.
 - **Size discipline:** store text and structured JSON only — never binaries or embedded fonts/images. Warn the user near the ~5MB quota.
-- **Backup:** export/import a single JSON blob containing all stores for manual portability between devices.
+- **Backup:** `serialization.ts` exports/imports a single validated JSON blob (`cvpower-backup`) for manual portability between devices, in `replace` or `merge` mode.
 
 ## 6. Engines (client-side, pure)
 - **Scoring** — explainable 0–100 with weighted sub-scores. See [scoring-engine.md](scoring-engine.md).

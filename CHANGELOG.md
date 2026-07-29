@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Milestone 2 — Resume Core Engine
+- Added the feature-based architecture under `src/features/` (resume implemented;
+  scoring/matching/pdf/templates/ai/plugins reserved).
+- Built the resume data engine in `src/features/resume`: Zod schema as the single
+  source of truth with inferred TypeScript types; pure `operations` (all business
+  logic, immutable); factories; a Zustand `store` (create/duplicate/delete,
+  unlimited resumes, section CRUD); SSR-safe **debounced LocalStorage** persistence;
+  versioned **migrations**; and JSON **backup** import/export (replace + merge).
+- Added shared `lib/id` and `lib/debounce` utilities.
+- Added Vitest unit tests for schema, operations, migrations, serialization,
+  persistence (debounce), and the store.
+- No UI: editor, dashboard, scoring, matching, PDF, and AI are out of scope for M2.
+
 ### Fixed
 - **i18n startup crash:** removed `hasLocale` (a next-intl **v4-only** export) which
   broke the app on the installed next-intl v3. Locale validation now uses a local

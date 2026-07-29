@@ -226,7 +226,9 @@ export function updateArrayItem<K extends ArraySectionKey>(
       r,
       key,
       getArraySection(r, key).map((item) =>
-        item.id === itemId ? ({ ...item, ...patch, id: item.id }) : item,
+        item.id === itemId
+          ? ({ ...item, ...patch, id: item.id } as ArraySectionItem<K>)
+          : item,
       ),
     ),
   );
